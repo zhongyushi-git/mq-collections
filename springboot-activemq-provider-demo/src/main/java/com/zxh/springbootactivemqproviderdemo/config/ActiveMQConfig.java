@@ -2,10 +2,14 @@ package com.zxh.springbootactivemqproviderdemo.config;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.connection.JmsTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.jms.Topic;
 
@@ -28,6 +32,17 @@ public class ActiveMQConfig {
     @Bean
     public Topic topic() {
         return new ActiveMQTopic(activemqTopic);
+    }
+
+
+    /**
+     * jms事务管理器
+     * @param connectionFactory
+     * @return
+     */
+    @Bean
+    public PlatformTransactionManager createTransactionManager(@Qualifier("jmsConnectionFactory") ConnectionFactory connectionFactory){
+        return new JmsTransactionManager(connectionFactory);
     }
 
 

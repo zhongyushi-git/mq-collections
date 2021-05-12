@@ -11,12 +11,14 @@ import java.io.FileOutputStream;
 public class ConsumerListener {
 
     @JmsListener(destination = "${activemq.queue}")
-    public void receiveQueue(Message message) {
+    public void receiveQueue(Message message,Session session) {
         try {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 System.out.println("自定义属性："+textMessage.getStringProperty("订单"));
                 System.out.println("收到message是：" + textMessage.getText());
+                //提交事务
+                session.commit();
             } else if (message instanceof MapMessage) {
                 MapMessage mapMessage = (MapMessage) message;
                 System.out.println("收到message是：" + mapMessage.getString("name") + "," + mapMessage.getInt("age"));
@@ -37,6 +39,11 @@ public class ConsumerListener {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                session.rollback();
+            } catch (JMSException jmsException) {
+                jmsException.printStackTrace();
+            }
         }
     }
 
